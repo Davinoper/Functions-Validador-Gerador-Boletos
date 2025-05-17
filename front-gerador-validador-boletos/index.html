@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gerar Código de Barras</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-500: #2563eb;
+      --primary-600: #1d4ed8;
+      --primary-700: #1e40af;
+      --success: #16a34a;
+      --error: #dc2626;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-800: #1f2937;
+      --radius: 12px;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--gray-800);
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #eef2ff 0%, #fdf2f8 100%);
+      padding: 2rem;
+    }
+
+    .card {
+      background: #fff;
+      padding: 2rem 2.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      width: clamp(300px, 90vw, 440px);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      text-align: center;
+      color: var(--primary-700);
+      margin: 0;
+    }
+
+    label {
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    input {
+      padding: 0.65rem 0.9rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary-500);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    button {
+      padding: 0.75rem 1rem;
+      background: var(--primary-600);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    button:hover {
+      background: var(--primary-700);
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #barcode {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-100);
+      border-radius: var(--radius);
+      padding: 1rem;
+      text-align: center;
+      font-weight: 600;
+      word-break: break-all;
+    }
+
+    img {
+      align-self: center;
+      max-width: 260px;
+      border: 1px solid var(--gray-100);
+      border-radius: var(--radius);
+    }
+
+    #validateMsg {
+      font-weight: 600;
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--gray-800);
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Gerar Código de Barras</h1>
+    <form id="form">
+      <label>
+        Valor (R$)
+        <input id="valor" type="number" step="0.01" min="0" placeholder="Ex.: 100.00" required />
+      </label>
+      <label>
+        Data de vencimento
+        <input id="data" type="date" required />
+      </label>
+      <button id="btn" type="submit">Enviar</button>
+    </form>
+
+    <div id="barcode" hidden></div>
+    <img id="img" alt="Barcode" hidden />
+
+    <button id="validateBtn" type="button" hidden disabled>Validar código</button>
+    <p id="validateMsg" hidden></p>
+
+    <footer>Back-ends: <code>/barcode-generate</code> &amp; <code>/barcode-validate</code></footer>
+  </main>
+
+  <script>
+    const form         = document.getElementById('form');
+    const btnGenerate  = document.getElementById('btn');
+    const barcodeDiv   = document.getElementById('barcode');
+    const img          = document.getElementById('img');
+    const validateBtn  = document.getElementById('validateBtn');
+    const validateMsg  = document.getElementById('validateMsg');
+
+    let generatedBarcode = null;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btnGenerate.disabled = true;
+      resetValidation();
+
+      const valor = parseFloat(form.valor.value);
+      const data  = form.data.value;
+
+      if (isNaN(valor) || !data) {
+        alert('Preencha os campos corretamente');
+        btnGenerate.disabled = false;
+        return;
+      }
+
+      try {
+        const res = await fetch('http://localhost:7066/api/barcode-generate', {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ valor, dataVencimento: data })
+        });
+
+        if (!res.ok) throw new Error(`Erro ${res.status}`);
+
+        const json = await res.json();
+
+        barcodeDiv.textContent = json.barcode;
+        barcodeDiv.hidden      = false;
+
+        img.src    = `data:image/png;base64,${json.imageBase64}`;
+        img.hidden = false;
+
+        generatedBarcode       = json.barcode;
+        validateBtn.hidden     = false;
+        validateBtn.disabled   = false;
+      } catch (err) {
+        alert('Falha ao gerar código: ' + err.message);
+      } finally {
+        btnGenerate.disabled = false;
+      }
+    });
+
+    validateBtn.addEventListener('click', async () => {
+      if (!generatedBarcode) return;
+      validateBtn.disabled = true;
+      try {
+        const res = await fetch('http://localhost:7282/api/barcode-validate', {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ barcode: generatedBarcode })
+        });
+        if (!res.ok) throw new Error(`Erro ${res.status}`);
+
+        const data = await res.json();
+        validateMsg.hidden = false;
+
+        if (data.valido) {
+          validateMsg.textContent = `${data.message} (Venc.: ${data.dataVencimento})`;
+          validateMsg.style.color = 'var(--success)';
+          validateBtn.style.background = 'var(--success)';
+        } else {
+          validateMsg.textContent = data.message || 'Código inválido';
+          validateMsg.style.color = 'var(--error)';
+          validateBtn.style.background = 'var(--error)';
+        }
+      } catch (err) {
+        alert('Falha ao validar: ' + err.message);
+      } finally {
+        validateBtn.disabled = false;
+      }
+    });
+
+    function resetValidation() {
+      validateMsg.hidden = true;
+      validateBtn.hidden = true;
+      validateBtn.style.background = 'var(--primary-600)';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fnGeradorDeBoletos", "fnGeradorDeBoletos\fnGeradorDeBoletos.csproj", "{659C8292-4BE9-43AB-86D4-F9E4D36FEC40}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fnValidadorDeBoleto", "fnValidadorDeBoleto\fnValidadorDeBoleto.csproj", "{7AB07EDA-DD65-4642-97F0-2F8B31B70532}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{659C8292-4BE9-43AB-86D4-F9E4D36FEC40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{659C8292-4BE9-43AB-86D4-F9E4D36FEC40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{659C8292-4BE9-43AB-86D4-F9E4D36FEC40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{659C8292-4BE9-43AB-86D4-F9E4D36FEC40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AB07EDA-DD65-4642-97F0-2F8B31B70532}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AB07EDA-DD65-4642-97F0-2F8B31B70532}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AB07EDA-DD65-4642-97F0-2F8B31B70532}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AB07EDA-DD65-4642-97F0-2F8B31B70532}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5A6FEF50-6102-44C1-A264-9B42E4294967}
+	EndGlobalSection
+EndGlobal
